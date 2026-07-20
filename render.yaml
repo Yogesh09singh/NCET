@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: ncet-backend
+    root: backend
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: MONGODB_URI
+        value: mongodb+srv://yogeshsingh09:yogeshsingh09@cluster0.38oaghi.mongodb.net/kisansetu?retryWrites=true&w=majority&appName=Cluster0
+      - key: JWT_SECRET
+        value: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      - key: PORT
+        value: 8080
