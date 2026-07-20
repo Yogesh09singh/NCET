@@ -346,7 +346,7 @@ railway up
 
 ---
 
-#### **Option B: Render.com**
+#### **Option B: Render.com (Recommended)**
 
 1. **Go to render.com**
    - Click "New +" → "Web Service"
@@ -356,20 +356,20 @@ railway up
 2. **Configure Service**
    - **Name:** `ncet-backend`
    - **Root Directory:** `backend`
-   - **Environment:** `Docker`
-   - **Build Command:** `./mvnw clean package`
-   - **Start Command:** `java -cp target/classes:$MAVEN_HOME/target/dependency/* com.kisansetu.backend.BackendApplication`
+   - **Environment:** `Docker` (automatically detects Dockerfile)
+   - Leave Build and Start commands empty (Render uses Dockerfile)
 
 3. **Environment Variables** (add in Render dashboard)
    ```
-   MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/kisansetu
-   JWT_SECRET=your-secret-key
+   MONGODB_URI=mongodb+srv://yogeshsingh09:yogeshsingh09@cluster0.38oaghi.mongodb.net/kisansetu?retryWrites=true&w=majority&appName=Cluster0
+   JWT_SECRET=404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
    PORT=8080
    ```
 
 4. **Deploy**
    - Click "Create Web Service"
-   - Render auto-deploys on push ✅
+   - Render auto-detects the Dockerfile and builds with Java 21 + Maven ✅
+   - Auto-deploys on every push to main ✅
 
 ---
 
@@ -434,9 +434,14 @@ After deployment, your application will be accessible at:
 
 ### **Common Deployment Issues & Fixes**
 
-**Issue: `./mvn: command not found` on Render**
-- ✅ Solution: Use `./mvnw clean package` (Maven wrapper)
-- Maven wrapper is already included in this repo ✅
+**Issue: `JAVA_HOME is not defined correctly` on Render**
+- ✅ Solution: Use the Dockerfile (automatically detected if Environment is set to Docker)
+- The repo includes a Dockerfile that bundles Java 21 and Maven ✅
+- Ensure Root Directory is `backend` so Render finds the Dockerfile
+
+**Issue: `./mvn: command not found` or `Permission denied`**
+- ✅ Solution: Use the Dockerfile instead of direct mvnw commands
+- The Dockerfile handles all build steps automatically
 
 **Issue: CORS errors after deployment**
 - ✅ Solution: Update `spring.web.cors.allowed-origins` in `application.properties`
