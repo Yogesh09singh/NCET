@@ -23,6 +23,9 @@ backend/*.log
 .DS_Store
 Thumbs.db
 
+# Old/Nested Directories
+NCET/
+
 # Environment
 .env
 .env.local
