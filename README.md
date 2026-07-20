@@ -294,7 +294,164 @@ git push origin main
 
 ---
 
-## 🎯 Future Enhancements
+## � Deployment Guide
+
+### **Frontend Deployment (Vercel)**
+
+1. **Connect Repository**
+   - Go to [vercel.com/new](https://vercel.com/new)
+   - Import `Yogesh09singh/NCET` repository
+   - Click "Import"
+
+2. **Configure Build Settings**
+   - **Framework:** Vite
+   - **Root Directory:** `frontend`
+   - **Build Command:** `npm run build`
+   - **Output Directory:** `dist`
+
+3. **Environment Variables**
+   - Add `VITE_API_URL` → Your backend URL (e.g., `https://your-backend.railway.app`)
+
+4. **Deploy**
+   - Vercel auto-deploys on every push to `main` ✅
+   - Your frontend will be live at: `https://your-app.vercel.app`
+
+---
+
+### **Backend Deployment (Railway or Render)**
+
+#### **Option A: Railway (Recommended)**
+
+```bash
+# 1. Install Railway CLI
+npm install -g @railway/cli
+
+# 2. Login to Railway
+railway login
+
+# 3. Initialize project
+cd backend
+railway init
+
+# 4. Set environment variables
+railway variables set MONGODB_URI="your-mongodb-atlas-uri"
+railway variables set JWT_SECRET="your-secret-key"
+railway variables set PORT=8080
+
+# 5. Deploy
+railway up
+```
+
+**Railway will auto-detect Spring Boot and deploy!** ✅
+
+---
+
+#### **Option B: Render.com**
+
+1. **Go to render.com**
+   - Click "New +" → "Web Service"
+   - Connect your GitHub account
+   - Select `Yogesh09singh/NCET` repository
+
+2. **Configure Service**
+   - **Name:** `ncet-backend`
+   - **Root Directory:** `backend`
+   - **Environment:** `Docker`
+   - **Build Command:** `./mvnw clean package`
+   - **Start Command:** `java -cp target/classes:$MAVEN_HOME/target/dependency/* com.kisansetu.backend.BackendApplication`
+
+3. **Environment Variables** (add in Render dashboard)
+   ```
+   MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/kisansetu
+   JWT_SECRET=your-secret-key
+   PORT=8080
+   ```
+
+4. **Deploy**
+   - Click "Create Web Service"
+   - Render auto-deploys on push ✅
+
+---
+
+### **Production Configuration**
+
+#### **Update Backend Settings**
+
+Edit `backend/src/main/resources/application.properties`:
+
+```properties
+# MongoDB
+spring.data.mongodb.uri=${MONGODB_URI:mongodb+srv://yogeshsingh09:yogeshsingh09@cluster0.38oaghi.mongodb.net/kisansetu}
+
+# Server
+server.port=${PORT:8080}
+server.servlet.context-path=/api
+
+# CORS - Update with your Vercel domain
+spring.web.cors.allowed-origins=https://your-vercel-app.vercel.app,http://localhost:5173
+
+# JWT
+jwt.secret=${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+jwt.expiration=86400000
+```
+
+#### **Update Frontend Configuration**
+
+Edit `frontend/src/services/api.js`:
+
+```javascript
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+});
+
+// JWT interceptor
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export default api;
+```
+
+---
+
+### **Final Deployment URLs**
+
+After deployment, your application will be accessible at:
+
+| Component | URL | Provider |
+|-----------|-----|----------|
+| **Frontend** | `https://your-app.vercel.app` | Vercel |
+| **Backend API** | `https://your-backend.railway.app` | Railway/Render |
+| **Database** | MongoDB Atlas (Cloud) | MongoDB |
+
+---
+
+### **Common Deployment Issues & Fixes**
+
+**Issue: `./mvn: command not found` on Render**
+- ✅ Solution: Use `./mvnw clean package` (Maven wrapper)
+- Maven wrapper is already included in this repo ✅
+
+**Issue: CORS errors after deployment**
+- ✅ Solution: Update `spring.web.cors.allowed-origins` in `application.properties`
+- Add your Vercel domain to allowed origins
+
+**Issue: Database connection fails**
+- ✅ Solution: Whitelist Render/Railway IP in MongoDB Atlas Network Access
+- Check MongoDB Atlas dashboard → Network Access → Add Current IP
+
+**Issue: JWT token not working**
+- ✅ Solution: Ensure `JWT_SECRET` environment variable matches in both local and production
+
+---
+
+## �🎯 Future Enhancements
 - Real-time notifications for order updates
 - Payment gateway integration (Stripe/Razorpay)
 - Review & rating system
